@@ -8,6 +8,9 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
+* {
+  font-family: var(--font-sans);
+}
 
 :root {
   --background: hsl(0 0% 100%);

@@ -2,8 +2,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import axios from 'axios';
-
 import React, { useState } from 'react';
+
 import { Toaster } from 'react-hot-toast';
 
 const MAX_RETRIES = 2;
@@ -41,9 +41,12 @@ export default function Provider({ children }: { children: React.ReactNode }) {
   );
   return (
     <QueryClientProvider client={client}>
-      {children}
-      <Toaster />
-      <ReactQueryDevtools initialIsOpen={false} />
+      <>
+
+        {children}
+        <Toaster />
+        <ReactQueryDevtools initialIsOpen={false} />
+      </>
     </QueryClientProvider>
   );
 }
