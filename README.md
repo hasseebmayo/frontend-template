@@ -1,4 +1,4 @@
- Next.js Template Documentation
+Next.js Template Documentation
 
 # This a Next.js template
 
@@ -358,3 +358,70 @@ export function InputForm() {
 ## Defining Zod Schemas
 
 All zod schemas should be placed in the `/lib/schema` folder. Organize them into files based on logical domains.
+
+## How to use this template
+
+### Install & run
+
+- Install deps: `pnpm install`
+- Start dev server: `pnpm dev`
+- Build: `pnpm build`
+- Start production: `pnpm start`
+
+### Linting & formatting (Biome)
+
+This project uses Biome for both linting and formatting (Next.js 15.5 deprecates `next lint`).
+
+- Check: `pnpm lint`
+- Fix: `pnpm lint:fix`
+- Format: `pnpm format`
+
+VS Code: the workspace recommends the Biome extension and sets it as the default formatter.
+
+### Git hooks (Husky)
+
+Husky runs checks on commit:
+
+- `pre-commit`: runs `pnpm lint` and `pnpm typecheck`
+- `commit-msg`: validates commit messages with Commitlint (Conventional Commits)
+
+Enable hooks after cloning:
+
+```
+pnpm install
+pnpm prepare
+```
+
+Bypass hooks with `--no-verify` (not recommended):
+
+```
+git commit -m "chore: wip" --no-verify
+```
+
+### Commit message conventions (Commitlint)
+
+We follow Conventional Commits. Format:
+
+```
+<type>(optional scope): <subject>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+Common types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
+
+Examples:
+
+- `feat(auth): add OAuth flow`
+- `fix(ui): button hover state on Safari`
+- `chore: update deps`
+
+Run commitlint manually (optional):
+
+```
+pnpm dlx -p @commitlint/config-conventional @commitlint/cli commitlint \
+  --from HEAD~10 --to HEAD \
+  --extends @commitlint/config-conventional
+```

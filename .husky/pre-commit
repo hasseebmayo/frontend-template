@@ -1,0 +1,16 @@
+
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Optional: run Biome on staged files first if lint-staged is configured
+if command -v pnpm >/dev/null 2>&1 && pnpm -v >/dev/null 2>&1; then
+	if pnpm -s exec -- lint-staged -v >/dev/null 2>&1; then
+		pnpm lint-staged || exit 1
+	fi
+fi
+
+# Full project checks
+pnpm lint || exit 1
+pnpm typecheck || exit 1
+
+echo "✅ Pre-commit checks passed!"

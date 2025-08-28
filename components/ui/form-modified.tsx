@@ -1,95 +1,96 @@
-"use client";
+"use client"
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import type { ReactNode } from "react";
-import React, { memo, useEffect, useMemo, useRef } from "react";
+import { zodResolver } from "@hookform/resolvers/zod"
+import type React from "react"
+import type { ReactNode } from "react"
+import { memo, useEffect, useMemo, useRef } from "react"
 import type {
-	Control,
-	DefaultValues,
-	FieldValues,
-	Path,
-	SubmitHandler,
-	UseFormReturn,
-} from "react-hook-form";
-import { useForm } from "react-hook-form";
-import type { infer as ZodInfer, ZodType } from "zod";
+  Control,
+  DefaultValues,
+  FieldValues,
+  Path,
+  SubmitHandler,
+  UseFormReturn,
+} from "react-hook-form"
+import { useForm } from "react-hook-form"
+import type { infer as ZodInfer, ZodType, ZodTypeAny, ZodTypeDef } from "zod"
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils"
 
 import {
-	Form,
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
-} from "./form";
-import { Input } from "./input";
-import { Textarea } from "./textarea";
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./form"
+import { Input } from "./input"
+import { Textarea } from "./textarea"
 
 /* ----------------------------------------------------------------------------
  * Shared Types
  * -------------------------------------------------------------------------- */
 
 type FormFieldLayoutProps = {
-	label?: string;
-	description?: string;
-	formItemClassName?: string;
-	labelClassName?: string;
-	descriptionClassName?: string;
-};
+  label?: string
+  description?: string
+  formItemClassName?: string
+  labelClassName?: string
+  descriptionClassName?: string
+}
 
 type WrappedFieldProps<T extends FieldValues> = {
-	name: Path<T>;
-} & FormFieldLayoutProps;
+  name: Path<T>
+} & FormFieldLayoutProps
 
 export type FormFieldProps<T extends FieldValues> = {
-	control: Control<T>;
-	name: Path<T>;
-	children: React.ReactNode | ((field: FieldValues) => React.ReactNode);
-} & FormFieldLayoutProps;
+  control: Control<T>
+  name: Path<T>
+  children: React.ReactNode | ((field: FieldValues) => React.ReactNode)
+} & FormFieldLayoutProps
 
 /* ----------------------------------------------------------------------------
  * Wrapper Component
  * -------------------------------------------------------------------------- */
 
 export function FormFieldWrapper<T extends FieldValues>({
-	label,
-	control,
-	name,
-	formItemClassName,
-	children,
-	description,
-	descriptionClassName,
-	labelClassName,
+  label,
+  control,
+  name,
+  formItemClassName,
+  children,
+  description,
+  descriptionClassName,
+  labelClassName,
 }: FormFieldProps<T>) {
-	return (
-		<FormField
-			name={name}
-			control={control}
-			render={({ field }) => (
-				<FormItem className={cn(formItemClassName)}>
-					{label && (
-						<FormLabel className={cn("text-muted-foreground", labelClassName)}>
-							{label}
-						</FormLabel>
-					)}
-					<FormControl>
-						{typeof children === "function" ? children(field) : children}
-					</FormControl>
-					{description && (
-						<FormDescription
-							className={cn("text-muted-foreground", descriptionClassName)}
-						>
-							{description}
-						</FormDescription>
-					)}
-					<FormMessage />
-				</FormItem>
-			)}
-		/>
-	);
+  return (
+    <FormField
+      name={name}
+      control={control}
+      render={({ field }) => (
+        <FormItem className={cn(formItemClassName)}>
+          {label && (
+            <FormLabel className={cn("text-muted-foreground", labelClassName)}>
+              {label}
+            </FormLabel>
+          )}
+          <FormControl>
+            {typeof children === "function" ? children(field) : children}
+          </FormControl>
+          {description && (
+            <FormDescription
+              className={cn("text-muted-foreground", descriptionClassName)}
+            >
+              {description}
+            </FormDescription>
+          )}
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  )
 }
 
 /* ----------------------------------------------------------------------------
@@ -97,178 +98,192 @@ export function FormFieldWrapper<T extends FieldValues>({
  * -------------------------------------------------------------------------- */
 
 type FormComponents<T extends FieldValues> = {
-	Input: (
-		props: WrappedFieldProps<T> &
-			Omit<React.ComponentProps<"input">, "name" | "onChange" | "onBlur">,
-	) => ReactNode;
-	Textarea: (
-		props: WrappedFieldProps<T> &
-			Omit<React.ComponentProps<"textarea">, "name" | "onChange" | "onBlur">,
-	) => ReactNode;
-	Field: React.ComponentType<Omit<FormFieldProps<T>, "control">>;
-};
+  Input: (
+    props: WrappedFieldProps<T> &
+      Omit<React.ComponentProps<"input">, "name" | "onChange" | "onBlur">
+  ) => ReactNode
+  Textarea: (
+    props: WrappedFieldProps<T> &
+      Omit<React.ComponentProps<"textarea">, "name" | "onChange" | "onBlur">
+  ) => ReactNode
+  Field: React.ComponentType<Omit<FormFieldProps<T>, "control">>
+}
 
 function createFormComponents<T extends FieldValues>(
-	control: UseFormReturn<T>["control"],
+  control: UseFormReturn<T>["control"]
 ): FormComponents<T> {
-	return {
-		Input: ({
-			name,
-			label,
-			description,
-			formItemClassName,
-			labelClassName,
-			descriptionClassName,
-			...rest
-		}) => (
-			<FormFieldWrapper
-				control={control}
-				name={name}
-				label={label}
-				description={description}
-				formItemClassName={formItemClassName}
-				labelClassName={labelClassName}
-				descriptionClassName={descriptionClassName}
-			>
-				{(field) => <Input {...field} {...rest} />}
-			</FormFieldWrapper>
-		),
+  return {
+    Input: ({
+      name,
+      label,
+      description,
+      formItemClassName,
+      labelClassName,
+      descriptionClassName,
+      ...rest
+    }) => (
+      <FormFieldWrapper
+        control={control}
+        name={name}
+        label={label}
+        description={description}
+        formItemClassName={formItemClassName}
+        labelClassName={labelClassName}
+        descriptionClassName={descriptionClassName}
+      >
+        {(field) => <Input {...field} {...rest} />}
+      </FormFieldWrapper>
+    ),
 
-		Textarea: ({
-			name,
-			label,
-			description,
-			formItemClassName,
-			labelClassName,
-			descriptionClassName,
-			...rest
-		}) => (
-			<FormFieldWrapper
-				control={control}
-				name={name}
-				label={label}
-				description={description}
-				formItemClassName={formItemClassName}
-				labelClassName={labelClassName}
-				descriptionClassName={descriptionClassName}
-			>
-				{(field) => <Textarea {...field} {...rest} />}
-			</FormFieldWrapper>
-		),
+    Textarea: ({
+      name,
+      label,
+      description,
+      formItemClassName,
+      labelClassName,
+      descriptionClassName,
+      ...rest
+    }) => (
+      <FormFieldWrapper
+        control={control}
+        name={name}
+        label={label}
+        description={description}
+        formItemClassName={formItemClassName}
+        labelClassName={labelClassName}
+        descriptionClassName={descriptionClassName}
+      >
+        {(field) => <Textarea {...field} {...rest} />}
+      </FormFieldWrapper>
+    ),
 
-		Field: (props) => <FormFieldWrapper control={control} {...props} />,
-	};
+    Field: (props) => <FormFieldWrapper control={control} {...props} />,
+  }
 }
 
 /* ----------------------------------------------------------------------------
  * Form Component
  * -------------------------------------------------------------------------- */
 
-type FormProps<Schema extends ZodType<any, any, any>> = {
-	schema: Schema;
-	onSubmit: SubmitHandler<ZodInfer<Schema>>;
-	children: (context: {
-		methods: UseFormReturn<ZodInfer<Schema>>;
-		components: FormComponents<ZodInfer<Schema>>;
-	}) => ReactNode;
-	defaultValues?: DefaultValues<ZodInfer<Schema>>;
-	disabled?: boolean;
-	formProps?: Omit<React.ComponentProps<"form">, "onSubmit" | "children">;
-	fieldsetProps?: Omit<
-		React.ComponentProps<"fieldset">,
-		"disabled" | "children"
-	>;
-	useFieldset?: boolean;
-	formKey?: string | number;
-	warnOnUnsavedChanges?: boolean;
-	unsavedChangesMessage?: string;
-};
+// Alias to express the Zod schema used with react-hook-form while avoiding explicit 'any' in public generics
+type ZodSchemaForForm<FormValues extends FieldValues> = ZodType<
+  FormValues,
+  ZodTypeDef,
+  FormValues
+>
 
-function FormModifiedComponent<Schema extends ZodType<any, any, any>>({
-	schema,
-	onSubmit,
-	children,
-	defaultValues,
-	disabled = false,
-	formProps,
-	fieldsetProps,
-	useFieldset = true,
-	formKey,
-	warnOnUnsavedChanges = false,
-	unsavedChangesMessage = "You have unsaved changes. Are you sure you want to leave?",
-}: FormProps<Schema>) {
-	const previousKey = useRef(formKey);
+type FormProps<
+  FormValues extends FieldValues,
+  Schema extends ZodSchemaForForm<FormValues>,
+> = {
+  schema: Schema
+  onSubmit: SubmitHandler<ZodInfer<Schema>>
+  children: (context: {
+    methods: UseFormReturn<ZodInfer<Schema>>
+    components: FormComponents<ZodInfer<Schema>>
+  }) => ReactNode
+  defaultValues?: DefaultValues<ZodInfer<Schema>>
+  disabled?: boolean
+  formProps?: Omit<React.ComponentProps<"form">, "onSubmit" | "children">
+  fieldsetProps?: Omit<
+    React.ComponentProps<"fieldset">,
+    "disabled" | "children"
+  >
+  useFieldset?: boolean
+  formKey?: string | number
+  warnOnUnsavedChanges?: boolean
+  unsavedChangesMessage?: string
+}
 
-	const methods = useForm<ZodInfer<Schema>>({
-		resolver: zodResolver(schema),
-		defaultValues,
-	});
+function FormModifiedComponent<
+  FormValues extends FieldValues,
+  Schema extends ZodSchemaForForm<FormValues>,
+>({
+  schema,
+  onSubmit,
+  children,
+  defaultValues,
+  disabled = false,
+  formProps,
+  fieldsetProps,
+  useFieldset = true,
+  formKey,
+  warnOnUnsavedChanges = false,
+  unsavedChangesMessage = "You have unsaved changes. Are you sure you want to leave?",
+}: FormProps<FormValues, Schema>) {
+  const previousKey = useRef(formKey)
 
-	const { formState } = methods;
-	const hasUnsavedChanges = formState.isDirty && !formState.isSubmitSuccessful;
+  const methods = useForm<ZodInfer<Schema>>({
+    resolver: zodResolver(schema as ZodTypeAny),
+    defaultValues,
+  })
 
-	useEffect(() => {
-		if (formKey !== undefined && formKey !== previousKey.current) {
-			previousKey.current = formKey;
-			methods.reset(defaultValues);
-		}
-	}, [formKey, defaultValues, methods]);
+  const { formState } = methods
+  const hasUnsavedChanges = formState.isDirty && !formState.isSubmitSuccessful
 
-	useEffect(() => {
-		if (!warnOnUnsavedChanges) {
-			return;
-		}
+  useEffect(() => {
+    if (formKey !== undefined && formKey !== previousKey.current) {
+      previousKey.current = formKey
+      methods.reset(defaultValues)
+    }
+  }, [formKey, defaultValues, methods])
 
-		const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-			if (hasUnsavedChanges) {
-				event.preventDefault();
-				event.returnValue = unsavedChangesMessage;
-				return unsavedChangesMessage;
-			}
-		};
+  useEffect(() => {
+    if (!warnOnUnsavedChanges) {
+      return
+    }
 
-		window.addEventListener("beforeunload", handleBeforeUnload);
-		return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-	}, [warnOnUnsavedChanges, hasUnsavedChanges, unsavedChangesMessage]);
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        event.preventDefault()
+        event.returnValue = unsavedChangesMessage
+        return unsavedChangesMessage
+      }
+    }
 
-	const components = useMemo(
-		() => createFormComponents(methods.control),
-		[methods.control],
-	);
-	const handleSubmit = methods.handleSubmit(onSubmit);
+    window.addEventListener("beforeunload", handleBeforeUnload)
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload)
+  }, [warnOnUnsavedChanges, hasUnsavedChanges, unsavedChangesMessage])
 
-	const formClass = cn("w-full", formProps?.className);
-	const wrapperClass = cn(fieldsetProps?.className);
+  const components = useMemo(
+    () => createFormComponents(methods.control),
+    [methods.control]
+  )
+  const handleSubmit = methods.handleSubmit(onSubmit)
 
-	return (
-		<Form {...methods}>
-			<form
-				onSubmit={handleSubmit}
-				noValidate
-				{...formProps}
-				className={formClass}
-			>
-				{useFieldset ? (
-					<fieldset
-						{...fieldsetProps}
-						disabled={disabled}
-						className={wrapperClass}
-					>
-						{children({ methods, components })}
-					</fieldset>
-				) : (
-					<div className={wrapperClass}>
-						{children({ methods, components })}
-					</div>
-				)}
-			</form>
-		</Form>
-	);
+  const formClass = cn("w-full", formProps?.className)
+  const wrapperClass = cn(fieldsetProps?.className)
+
+  return (
+    <Form {...methods}>
+      <form
+        onSubmit={handleSubmit}
+        noValidate
+        {...formProps}
+        className={formClass}
+      >
+        {useFieldset ? (
+          <fieldset
+            {...fieldsetProps}
+            disabled={disabled}
+            className={wrapperClass}
+          >
+            {children({ methods, components })}
+          </fieldset>
+        ) : (
+          <div className={wrapperClass}>
+            {children({ methods, components })}
+          </div>
+        )}
+      </form>
+    </Form>
+  )
 }
 
 const FormModified = memo(FormModifiedComponent) as <
-	Schema extends ZodType<any, any, any>,
+  FormValues extends FieldValues,
+  Schema extends ZodSchemaForForm<FormValues>,
 >(
-	props: FormProps<Schema>,
-) => ReactNode;
-export default FormModified;
+  props: FormProps<FormValues, Schema>
+) => ReactNode
+export default FormModified

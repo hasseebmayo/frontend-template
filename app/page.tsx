@@ -1,9 +1,9 @@
-import React from "react";
+// React import not needed for React 17+ JSX runtime
 
 export default function MainPage() {
-	return (
-		<div>
-			<p className="flex items-center w-2 h-3 h-4 justify-center">Testing</p>
-		</div>
-	);
+  return (
+    <div>
+      <p className="flex items-center justify-center">Testing</p>
+    </div>
+  )
 }
