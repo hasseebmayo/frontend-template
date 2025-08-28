@@ -1,7 +1,8 @@
 #!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
 
 # Validate commit message with commitlint (conventional)
-pnpm dlx -p @commitlint/config-conventional @commitlint/cli commitlint \
-	--extends @commitlint/config-conventional \
-	--edit "$1"
+if command -v pnpm >/dev/null 2>&1 && pnpm -v >/dev/null 2>&1; then
+	pnpm exec commitlint --extends @commitlint/config-conventional --edit "$1"
+else
+	npx --yes @commitlint/cli commitlint --extends @commitlint/config-conventional --edit "$1"
+fi
