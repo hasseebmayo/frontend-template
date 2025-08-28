@@ -1,10 +1,10 @@
-import type { UseQueryResult } from '@tanstack/react-query';
-import type { JSX } from 'react';
-import { Loader2 } from 'lucide-react';
-import React from 'react';
-import { cn } from '../lib/utils';
-import EmptyCard from './empty-card';
-import ErrorCard from './error-card';
+import type { UseQueryResult } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
+import type { JSX } from "react";
+import React from "react";
+import { cn } from "../lib/utils";
+import EmptyCard from "./empty-card";
+import ErrorCard from "./error-card";
 
 /**
  * Loader component displays a spinning loader.
@@ -15,21 +15,21 @@ import ErrorCard from './error-card';
  * @returns {JSX.Element} Loader element.
  */
 function Loader({
-  className,
-  loaderClassName,
+	className,
+	loaderClassName,
 }: {
-  className?: string;
-  loaderClassName?: string;
+	className?: string;
+	loaderClassName?: string;
 }) {
-  return (
-    <div
-      className={cn('flex h-10 w-full items-center justify-center', className)}
-    >
-      <Loader2
-        className={cn('size-5 animate-spin text-primary', loaderClassName)}
-      />
-    </div>
-  );
+	return (
+		<div
+			className={cn("flex h-10 w-full items-center justify-center", className)}
+		>
+			<Loader2
+				className={cn("size-5 animate-spin text-primary", loaderClassName)}
+			/>
+		</div>
+	);
 }
 
 /**
@@ -57,39 +57,39 @@ function Loader({
  *
  * @template T - The type of data returned by the query.
  */
-export type QueryStatusProps<T>
-  = | {
-    query: UseQueryResult<T>;
-    onWithLoadingState: (data: T, isLoading: boolean) => JSX.Element;
-    onError?:
-      | JSX.Element
-      | ((
-        error: unknown,
-        refetch: () => void,
-        isLoading: boolean
-      ) => JSX.Element);
-    // These props are disallowed in this branch
-    onLoading?: never;
-    onEmpty?: never;
-    onSuccess?: never;
-  }
-  | {
-    query: UseQueryResult<T>;
-    onLoading?:
-      | JSX.Element
-      | ((className?: string, loaderClassName?: string) => JSX.Element);
-    onError?:
-      | JSX.Element
-      | ((
-        error: unknown,
-        refetch: () => void,
-        isLoading: boolean
-      ) => JSX.Element);
-    onEmpty?: JSX.Element;
-    onSuccess: (data: NonNullable<T>) => JSX.Element;
-    // Disallow onWithLoadingState in this branch
-    onWithLoadingState?: never;
-  };
+export type QueryStatusProps<T> =
+	| {
+			query: UseQueryResult<T>;
+			onWithLoadingState: (data: T, isLoading: boolean) => JSX.Element;
+			onError?:
+				| JSX.Element
+				| ((
+						error: unknown,
+						refetch: () => void,
+						isLoading: boolean,
+				  ) => JSX.Element);
+			// These props are disallowed in this branch
+			onLoading?: never;
+			onEmpty?: never;
+			onSuccess?: never;
+	  }
+	| {
+			query: UseQueryResult<T>;
+			onLoading?:
+				| JSX.Element
+				| ((className?: string, loaderClassName?: string) => JSX.Element);
+			onError?:
+				| JSX.Element
+				| ((
+						error: unknown,
+						refetch: () => void,
+						isLoading: boolean,
+				  ) => JSX.Element);
+			onEmpty?: JSX.Element;
+			onSuccess: (data: NonNullable<T>) => JSX.Element;
+			// Disallow onWithLoadingState in this branch
+			onWithLoadingState?: never;
+	  };
 
 /**
  * Type guard to determine if the unified mode (onWithLoadingState) is used.
@@ -99,20 +99,20 @@ export type QueryStatusProps<T>
  * @returns {props is { query: UseQueryResult<T>; onWithLoadingState: (data: T, isLoading: boolean) => JSX.Element; onError?: JSX.Element | ((error: unknown, refetch: () => void, isLoading: boolean) => JSX.Element); }} True if unified mode is used.
  */
 function hasOnWithLoadingState<T>(props: QueryStatusProps<T>): props is {
-  query: UseQueryResult<T>;
-  onWithLoadingState: (data: T, isLoading: boolean) => JSX.Element;
-  onError?:
-    | JSX.Element
-    | ((
-      error: unknown,
-      refetch: () => void,
-      isLoading: boolean
-    ) => JSX.Element);
+	query: UseQueryResult<T>;
+	onWithLoadingState: (data: T, isLoading: boolean) => JSX.Element;
+	onError?:
+		| JSX.Element
+		| ((
+				error: unknown,
+				refetch: () => void,
+				isLoading: boolean,
+		  ) => JSX.Element);
 } {
-  return (
-    'onWithLoadingState' in props
-    && typeof props.onWithLoadingState === 'function'
-  );
+	return (
+		"onWithLoadingState" in props &&
+		typeof props.onWithLoadingState === "function"
+	);
 }
 
 /**
@@ -135,47 +135,47 @@ function hasOnWithLoadingState<T>(props: QueryStatusProps<T>): props is {
  * @returns {JSX.Element} The rendered UI element based on the query state.
  */
 function QueryStatus<T>(props: QueryStatusProps<T>): JSX.Element {
-  const { query } = props;
+	const { query } = props;
 
-  if (hasOnWithLoadingState(props)) {
-    if (query.isError && props.onError) {
-      return typeof props.onError === 'function'
-        ? props.onError(query.failureReason, query.refetch, query.isLoading)
-        : props.onError;
-    }
+	if (hasOnWithLoadingState(props)) {
+		if (query.isError && props.onError) {
+			return typeof props.onError === "function"
+				? props.onError(query.failureReason, query.refetch, query.isLoading)
+				: props.onError;
+		}
 
-    return props.onWithLoadingState(query.data as T, query.isLoading);
-  }
+		return props.onWithLoadingState(query.data as T, query.isLoading);
+	}
 
-  const {
-    onLoading = (c, l) => <Loader className={c} loaderClassName={l} />,
-    onError = (error, refetch, isLoading) => (
-      <ErrorCard error={error} isLoading={isLoading} onRetry={refetch} />
-    ),
-    onEmpty = <EmptyCard />,
-    onSuccess,
-  } = props;
+	const {
+		onLoading = (c, l) => <Loader className={c} loaderClassName={l} />,
+		onError = (error, refetch, isLoading) => (
+			<ErrorCard error={error} isLoading={isLoading} onRetry={refetch} />
+		),
+		onEmpty = <EmptyCard />,
+		onSuccess,
+	} = props;
 
-  if (query.isLoading) {
-    return typeof onLoading === 'function' ? onLoading() : onLoading;
-  }
+	if (query.isLoading) {
+		return typeof onLoading === "function" ? onLoading() : onLoading;
+	}
 
-  if (query.isError) {
-    return typeof onError === 'function'
-      ? onError(query.failureReason, query.refetch, query.isLoading)
-      : onError;
-  }
+	if (query.isError) {
+		return typeof onError === "function"
+			? onError(query.failureReason, query.refetch, query.isLoading)
+			: onError;
+	}
 
-  const isEmptyData = (data: unknown): boolean =>
-    data === undefined
-    || data === null
-    || (Array.isArray(data) && data.length === 0);
+	const isEmptyData = (data: unknown): boolean =>
+		data === undefined ||
+		data === null ||
+		(Array.isArray(data) && data.length === 0);
 
-  if (isEmptyData(query.data) && onEmpty) {
-    return onEmpty;
-  }
+	if (isEmptyData(query.data) && onEmpty) {
+		return onEmpty;
+	}
 
-  return onSuccess(query.data as NonNullable<T>);
+	return onSuccess(query.data as NonNullable<T>);
 }
 
 export default QueryStatus;
